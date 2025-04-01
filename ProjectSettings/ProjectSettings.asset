@@ -141,7 +141,11 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 0.1
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: c677e5c4eb85b7849a8da406775c299d, type: 2}
+  - {fileID: -5527870613645768376, guid: 6918b23ee436bf7429df8400a7db669e, type: 2}
+  - {fileID: 11400000, guid: 17c0743d687dc794e8f400ad9f2e5836, type: 2}
+  - {fileID: -281745148249699770, guid: 3e612247ab32a244ea1808a9d678df11, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -686,11 +690,11 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: ARHololens-capstone
   metroPackageVersion: 1.0.0.0
-  metroCertificatePath: 
+  metroCertificatePath: Assets/WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: DefaultCompany
+  metroCertificateIssuer: DefaultCompany
+  metroCertificateNotAfter: 80266386f7c1dc01
   metroApplicationDescription: ARHololens
   wsaImages: {}
   metroTileShortName: ARHololens
@@ -709,7 +713,10 @@ PlayerSettings:
   platformCapabilities:
     WindowsStoreApps:
       GazeInput: True
+      PrivateNetworkClientServer: True
+      InternetClientServer: True
       SpatialPerception: True
+      InternetClient: True
       WebCam: True
       Microphone: True
   metroTargetDeviceFamilies: {}

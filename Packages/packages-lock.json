@@ -23,6 +23,12 @@
       "source": "local-tarball",
       "dependencies": {}
     },
+    "com.microsoft.spatialaudio.spatializer.unity": {
+      "version": "file:MixedReality/com.microsoft.spatialaudio.spatializer.unity-2.0.55.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {}
+    },
     "com.unity.burst": {
       "version": "1.8.18",
       "depth": 1,
