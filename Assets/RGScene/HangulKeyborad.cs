@@ -444,7 +444,7 @@ public class HangulKeyborad : MonoBehaviour
 
         if (isShift)
         {
-            goShiftKey.transform.GetChild(0).GetComponent<Image>().color = new Color(0, 0, 255);
+            goShiftKey.transform.GetChild(0).GetComponent<Image>().color = new Color(0, 255, 0);
         }
         else
         {
