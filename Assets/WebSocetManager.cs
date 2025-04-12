@@ -13,7 +13,7 @@ public class WebSocketManager : MonoBehaviour
     private NativeWebSocket.WebSocket websocket; // NativeWebSocket.WebSocket 명시적 사용
 
     public GameObject chatContentObject; // 기존 GameObject를 참조
-    public Text textToSend;
+    public InputField textToSend;
     private TextMeshProUGUI chatContentText;        // GameObject의 Text 컴포넌트 참조
     public string userId;               // 현재 사용자의 user_id
 
@@ -114,14 +114,10 @@ public class WebSocketManager : MonoBehaviour
     {
         if (websocket.State == WebSocketState.Open)
         {
-            ChatMessage chat = new ChatMessage
-            {
-                user_id = userId,        
-                message = textToSend.text    
-            };
-            string json = JsonUtility.ToJson(chat);
-            await websocket.SendText(json);
+            await websocket.SendText(textToSend.text);
         }
+
+        textToSend.text = "";
     }
 
     private void UpdateChatWindow(string message)
