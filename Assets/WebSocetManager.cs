@@ -3,6 +3,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using NativeWebSocket;
+using TMPro;
 
 public class WebSocketManager : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class WebSocketManager : MonoBehaviour
     private NativeWebSocket.WebSocket websocket; // NativeWebSocket.WebSocket 명시적 사용
 
     public GameObject chatContentObject; // 기존 GameObject를 참조
-    private Text chatContentText;        // GameObject의 Text 컴포넌트 참조
+    private TMP_Text chatContentText;        // GameObject의 Text 컴포넌트 참조
     public string userId;               // 현재 사용자의 user_id
 
     private void Awake()
@@ -33,11 +34,21 @@ public class WebSocketManager : MonoBehaviour
         // GameObject에서 Text 컴포넌트 가져오기
         if (chatContentObject != null)
         {
-            chatContentText = chatContentObject.GetComponent<Text>();
-            if (chatContentText == null)
-            {
-                Debug.LogError("The assigned GameObject does not have a Text component.");
-            }
+            GameObject textObject = new GameObject("ChatContentText");
+            textObject.transform.SetParent(chatContentObject.transform);
+
+            chatContentText = textObject.AddComponent<TMP_Text>();
+
+            chatContentText.fontSize = 24;
+            chatContentText.alignment = TextAlignmentOptions.TopLeft;
+            chatContentText.text = "";
+            chatContentText.color = Color.black;
+
+            RectTransform rectTransform = textObject.GetComponent<RectTransform>();
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
         }
         else
         {
