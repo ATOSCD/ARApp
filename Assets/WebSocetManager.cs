@@ -45,6 +45,7 @@ public class WebSocketManager : MonoBehaviour
             chatContentText.alignment = TextAlignmentOptions.TopLeft;
             chatContentText.text = "";
             chatContentText.color = Color.white;
+            chatContentText.font = Resources.Load<TMP_FontAsset>("malgun SDF");
 
             RectTransform rectTransform = textObject.GetComponent<RectTransform>();
             Debug.Log($"rectTransform = {rectTransform}");
