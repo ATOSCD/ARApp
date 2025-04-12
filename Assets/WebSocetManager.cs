@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using NativeWebSocket;
 using TMPro;
+using MixedReality.Toolkit;
 
 public class WebSocketManager : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class WebSocketManager : MonoBehaviour
     private NativeWebSocket.WebSocket websocket; // NativeWebSocket.WebSocket 명시적 사용
 
     public GameObject chatContentObject; // 기존 GameObject를 참조
-    private TMP_Text chatContentText;        // GameObject의 Text 컴포넌트 참조
+    private TextMeshProUGUI chatContentText;        // GameObject의 Text 컴포넌트 참조
     public string userId;               // 현재 사용자의 user_id
 
     private void Awake()
@@ -30,30 +31,41 @@ public class WebSocketManager : MonoBehaviour
 
     private void Start()
     {
-        ConnectToWebSocket();
+        Debug.Log($"userId = {userId}");
         // GameObject에서 Text 컴포넌트 가져오기
         if (chatContentObject != null)
         {
             GameObject textObject = new GameObject("ChatContentText");
-            textObject.transform.SetParent(chatContentObject.transform);
+            textObject.transform.SetParent(chatContentObject.transform,false);
+            Debug.Log($"textObject = {textObject}");
 
-            chatContentText = textObject.AddComponent<TMP_Text>();
+            chatContentText = textObject.AddComponent<TextMeshProUGUI>();
 
-            chatContentText.fontSize = 24;
+            chatContentText.fontSize = 0.5f;
             chatContentText.alignment = TextAlignmentOptions.TopLeft;
             chatContentText.text = "";
-            chatContentText.color = Color.black;
+            chatContentText.color = Color.white;
 
             RectTransform rectTransform = textObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
+            Debug.Log($"rectTransform = {rectTransform}");
+            
+            rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+            rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.localPosition = new Vector3(0, 0.4f, -0.01f);
+            rectTransform.localScale = new Vector3(0.1f, 0.1f, 0.1f); // 스케일 초기화
+            rectTransform.sizeDelta = new Vector2(9, 0); // 크기 조정
+            rectTransform.anchoredPosition = new Vector2(0, 0.4f); // 위치 조정
+            rectTransform.ForceUpdateRectTransforms();
+
+
+            ConnectToWebSocket();
         }
         else
         {
             Debug.LogError("ChatContentObject is not assigned.");
         }
+
     }
 
     //public void Initialize(string userId)
@@ -106,10 +118,13 @@ public class WebSocketManager : MonoBehaviour
 
     private void UpdateChatWindow(string message)
     {
+        ChatMessage chat = JsonUtility.FromJson<ChatMessage>(message);
+
+        string formattedMessage = $"<b>{chat.user_id}</b> : {chat.message}";
         // 기존 GameObject의 Text UI에 메시지 추가
         if (chatContentText != null)
         {
-            chatContentText.text += $"{message}\n";
+            chatContentText.text += $"{formattedMessage}\n";
         }
         else
         {
@@ -124,4 +139,18 @@ public class WebSocketManager : MonoBehaviour
             await websocket.Close();
         }
     }
+
+    private void Update()
+    {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        websocket?.DispatchMessageQueue();
+#endif
+    }
+}
+
+[System.Serializable]
+class ChatMessage
+{
+    public string user_id;
+    public string message;
 }
