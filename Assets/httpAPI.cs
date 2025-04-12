@@ -7,7 +7,7 @@ using Unity.VisualScripting;
 
 public class http : MonoBehaviour
 {
-    string base_url = "https://192.168.1.45:8000";
+    string base_url = "http://192.168.1.45:8000";
 
     public void GetAllMessages(string user_id)
     {
@@ -18,8 +18,10 @@ public class http : MonoBehaviour
     {
         string request_url = $"/get-messages/{user_id}";
         string url = base_url + request_url;
-
+        Debug.Log($"URL: {url}");
         UnityWebRequest request = UnityWebRequest.Get(url);
+        request.SetRequestHeader("Content-Type", "application/json");
+        
 
         yield return request.SendWebRequest();
 
