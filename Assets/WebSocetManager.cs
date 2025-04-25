@@ -42,22 +42,22 @@ public class WebSocketManager : MonoBehaviour
 
             chatContentText = textObject.AddComponent<TextMeshProUGUI>();
 
-            chatContentText.fontSize = 0.5f;
+            chatContentText.fontSize = 10;
             chatContentText.alignment = TextAlignmentOptions.TopLeft;
             chatContentText.text = "";
             chatContentText.color = Color.white;
-            chatContentText.font = Resources.Load<TMP_FontAsset>("malgun SDF");
+            chatContentText.font = Resources.Load<TMP_FontAsset>("malgun TMP");
 
             RectTransform rectTransform = textObject.GetComponent<RectTransform>();
             Debug.Log($"rectTransform = {rectTransform}");
             
-            rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-            rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.localPosition = new Vector3(0, 0.4f, -0.01f);
-            rectTransform.localScale = new Vector3(0.1f, 0.1f, 0.1f); // 스케일 초기화
-            rectTransform.sizeDelta = new Vector2(9, 0); // 크기 조정
-            rectTransform.anchoredPosition = new Vector2(0, 0.4f); // 위치 조정
+            rectTransform.anchorMin = new Vector2(0, 1);
+            rectTransform.anchorMax = new Vector2(0, 1);
+            rectTransform.pivot = new Vector2(0, 1);
+            rectTransform.localPosition = new Vector3(10, -110, -0.01f);
+            //rectTransform.localScale = new Vector3(0.1f, 0.1f, 0.1f); // 스케일 초기화
+            rectTransform.sizeDelta = new Vector2(280, 0); // 크기 조정
+            //rectTransform.anchoredPosition = new Vector2(0, 0.4f); // 위치 조정
             rectTransform.ForceUpdateRectTransforms();
 
 
@@ -84,7 +84,7 @@ public class WebSocketManager : MonoBehaviour
             return;
         }
 
-        string webSocketUrl = $"ws://192.168.1.45:8000/ws/chat?user_id={userId}";
+        string webSocketUrl = $"ws://10.5.20.100:8000/ws/chat?user_id={userId}";
         websocket = new NativeWebSocket.WebSocket(webSocketUrl);
 
         websocket.OnOpen += () =>
