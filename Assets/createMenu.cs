@@ -2,23 +2,32 @@ using UnityEngine;
 
 public class SpawnUniqueButtons : MonoBehaviour
 {
-    public GameObject[] buttonPrefabs; // 다른 디자인을 가진 버튼 프리팹 4개
+    public GameObject buttonBarPrefab; // 다른 디자인을 가진 버튼 프리팹 4개
     public Transform spawnParent; // 버튼을 배치할 부모 오브젝트
     public Vector3 spawnOffset = new Vector3(0.2f, 0, 0); // 생성 위치 간격
+    private GameObject newButton;
 
     public void SpawnNewButtons()
     {
-        for (int i = 0; i < buttonPrefabs.Length; i++)
+        if (buttonBarPrefab == null) return;
+        if ( newButton == null)
         {
-            if (buttonPrefabs[i] == null) continue;
-
-            Vector3 spawnPosition = transform.position + spawnOffset * (i + 1);
-            GameObject newButton = Instantiate(buttonPrefabs[i], spawnPosition, Quaternion.identity, spawnParent);
-
-            // 버튼에 고유한 역할을 설정하는 스크립트 추가
-            UniqueButtonBehavior buttonBehavior = newButton.AddComponent<UniqueButtonBehavior>();
-            buttonBehavior.SetButtonRole(i);
+            Vector3 spawnPosition = transform.position + spawnOffset;
+            newButton = Instantiate(buttonBarPrefab, spawnPosition, Quaternion.identity, spawnParent);
+            newButton.SetActive(true);
         }
+        else
+        {
+            if (newButton != null)
+            {
+                newButton.SetActive(true);
+            }
+        }
+    }
+
+    public void deleteButton()
+    {
+        newButton.SetActive(false);
     }
 }
 

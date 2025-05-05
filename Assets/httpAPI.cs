@@ -7,7 +7,8 @@ using Unity.VisualScripting;
 
 public class http : MonoBehaviour
 {
-    string base_url = "http://192.168.1.45:8000";
+    string base_url = SERVER.server;
+    public string user_id = SERVER.user_id;
 
     public void GetAllMessages(string user_id)
     {
