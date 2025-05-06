@@ -84,7 +84,7 @@ public class WebSocketManager : MonoBehaviour
             return;
         }
 
-        string webSocketUrl = $"ws://10.5.20.100:8000/ws/chat?user_id={userId}";
+        string webSocketUrl = $"ws://{SERVER.server}/ws/chat?user_id={userId}";
         websocket = new NativeWebSocket.WebSocket(webSocketUrl);
 
         websocket.OnOpen += () =>
