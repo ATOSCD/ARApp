@@ -22,11 +22,11 @@ public class HangulKeyborad : MonoBehaviour
     private bool isEngOn = true;
     private bool isSymbolAct = false;
     private bool isShift = false;
-    private bool isMan = true; //Gender Info //남녀확인
+    //private bool isMan = true; //Gender Info //남녀확인
 
-    private int selectTapNum = 0;
+    //private int selectTapNum = 0;
 
-    private int caretPosition = 0;//현재커서포지션
+    //private int caretPosition = 0;//현재커서포지션
 
     string[] EngKey = { "q", "w", "e", "r", "t", "y",
         "u","i", "o","p", "a","s", "d","f", "g", "h", "j", "k", "l", "z", "x","c", "v","b", "n","m"};
@@ -431,7 +431,7 @@ public class HangulKeyborad : MonoBehaviour
     {
         if (korField.text.Length <= 0) return;
         korField.text = korField.text.Substring(0, korField.text.Length - 1);
-        caretPosition--;
+        //caretPosition--;
     }
 
     //ShiftKey Change

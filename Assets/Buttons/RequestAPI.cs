@@ -1,26 +1,56 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
 
-public class AirConAPI : MonoBehaviour
+public class RequestAPI : MonoBehaviour
 {
     private string base_url = SERVER.server;
     public string user_id = SERVER.user_id;
+    public string category;
 
-    void Start()
+    private Coroutine autoRefreshCoroutine;
+
+    void OnEnable()
     {
-        StartCoroutine(GetRequests(user_id));
+        if (autoRefreshCoroutine == null)
+        {
+            StartCoroutine(GetRequests(user_id, category)); // 최초 요청
+            autoRefreshCoroutine = StartCoroutine(AutoRefreshRoutine()); // 중복 실행 방지
+        }
+    }
+
+    void OnDisable()
+    {
+        if (autoRefreshCoroutine != null)
+        {
+            StopCoroutine(autoRefreshCoroutine);
+            autoRefreshCoroutine = null;
+        }
+    }
+
+    private int routineCount = 0;
+
+    IEnumerator AutoRefreshRoutine()
+    {
+        routineCount++;
+        Debug.Log("AutoRefreshRoutine started: count = " + routineCount);
+
+        while (true)
+        {
+            yield return new WaitForSeconds(5f);
+            Debug.Log("Fetching data for user_id = " + user_id);
+            yield return StartCoroutine(GetRequests(user_id, category));
+        }
     }
 
     public void GetRequestNames()
     {
-        StartCoroutine(GetRequests(user_id));
+        StartCoroutine(GetRequests(user_id, category));
     }
     public TextMeshPro[] textMeshProObjects;
 
-    IEnumerator GetRequests(string user_id)
+    IEnumerator GetRequests(string user_id, string category)
     {
         string request_url = $"/get-button-by-category/";
         string url = $"http://" + base_url + request_url;
@@ -30,7 +60,7 @@ public class AirConAPI : MonoBehaviour
         RequestData requestBody = new RequestData
         {
             user_id = user_id,
-            category = "에어컨"
+            category = category
         };
         string jsonData = JsonUtility.ToJson(requestBody);
 
@@ -43,6 +73,7 @@ public class AirConAPI : MonoBehaviour
         request.SetRequestHeader("Accept", "application/json");
 
         yield return request.SendWebRequest();
+        Debug.Log($"Request sent: {jsonData}");
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
@@ -64,60 +95,12 @@ public class AirConAPI : MonoBehaviour
             }
         }
     }
-
-    public void SendRequest(TextMeshPro input)
-    {
-        StartCoroutine(SendRequests(user_id, input));
-    }
-
-    IEnumerator SendRequests(string user_id, TextMeshPro input)
-    {
-        string request_url = $"/send-notification/";
-        string url = $"http://" + base_url + request_url;
-        Debug.Log($"URL: {url}");
-
-        // 버튼 ID를 TextMeshPro 객체의 텍스트로 설정
-        string notificationBody = input.text;
-        // JSON 데이터 생성
-        RequestNotificationData requestBody = new RequestNotificationData
-        {
-            user_id = user_id,
-            title = "환자의 호출이 있습니다.",
-            body = notificationBody
-
-        };
-        string jsonData = JsonUtility.ToJson(requestBody);
-        // UnityWebRequest 생성
-        UnityWebRequest request = new UnityWebRequest(url, "POST");
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("Accept", "application/json");
-        yield return request.SendWebRequest();
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-        {
-            Debug.LogError($"ERROR: {request.error}");
-        }
-        else
-        {
-            string jsonResponse = request.downloadHandler.text;
-            Debug.Log($"Response: {jsonResponse}");
-        }
-    }
 }
 
 public class RequestData
 {
     public string user_id;
     public string category;
-}
-
-public class RequestNotificationData
-{
-    public string user_id;
-    public string title;
-    public string body;
 }
 
 [System.Serializable]

@@ -4912,7 +4912,7 @@ MonoBehaviour:
   cameraResolutionHeight: 480
   inferenceImgSize: 160
   numClasses: 14
-  confidenceThreshold: 0.2
+  confidenceThreshold: 0.3
   boundingBoxMaterial: {fileID: 2100000, guid: 763a3f8ddcbfda448b2c72cfc3529f00, type: 2}
   buttonPrefabs:
   - {fileID: 2186768370230316110, guid: d656a916b7db90f43bc79d8d4d647b63, type: 3}
@@ -4929,6 +4929,24 @@ MonoBehaviour:
   - {fileID: 2186768370230316110, guid: bb4b0ba0afb7bf94580ba5f1fda92ed4, type: 3}
   - {fileID: 2186768370230316110, guid: 7e93088ab710cb845b4b96011e1261c8, type: 3}
   - {fileID: 2186768370230316110, guid: dbceef2c4c3f3e349ae629820311a4e1, type: 3}
+--- !u!114 &386088162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386088144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4966719baa26e4b0e8231a24d9bd491a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FocusMode: -1
+  m_LightEstimationMode: -1
+  m_AutoFocus: 1
+  m_LightEstimation: 0
+  m_FacingDirection: 1
+  m_RenderMode: 0
 --- !u!224 &423663755 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8376646494505211229, guid: c6b351a67ceb69140b199996bbbea156, type: 3}
@@ -12369,6 +12387,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2351505566771328562, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
       insertIndex: -1
       addedObject: {fileID: 386088157}
+    - targetCorrespondingSourceObject: {fileID: 2351505566771328562, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 386088162}
   m_SourcePrefab: {fileID: 100100000, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
 --- !u!1001 &1113019466
 PrefabInstance:

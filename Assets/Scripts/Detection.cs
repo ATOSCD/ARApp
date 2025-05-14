@@ -180,44 +180,49 @@ public class Detection : MonoBehaviour
     {
         float zDistance = 2.0f;
 
-        float xMin = (det.Bbox.X - det.Bbox.Width / 2) * cameraResolutionWidth;
-        float yMin = (det.Bbox.Y - det.Bbox.Height / 2) * cameraResolutionHeight;
-        float xMax = (det.Bbox.X + det.Bbox.Width / 2) * cameraResolutionWidth;
-        float yMax = (det.Bbox.Y + det.Bbox.Height / 2) * cameraResolutionHeight;
+        Debug.Log("Bbox.X: " + det.Bbox.X);
+        Debug.Log("Bbox.Y: " + det.Bbox.Y);
+        Debug.Log("Bbox.Width: " + det.Bbox.Width);
+        Debug.Log("Bbox.Height: " + det.Bbox.Height);
+
+        float xMin = (det.Bbox.X - det.Bbox.Width / 2) * inferenceImgSize;
+        float yMin = (det.Bbox.Y - det.Bbox.Height / 2) * inferenceImgSize;
+        float xMax = (det.Bbox.X + det.Bbox.Width / 2) * inferenceImgSize;
+        float yMax = (det.Bbox.Y + det.Bbox.Height / 2) * inferenceImgSize;
 
         Vector3 worldBL = ImageToWorldPosition(xMin, yMin, zDistance);
         Vector3 worldTL = ImageToWorldPosition(xMin, yMax, zDistance);
         Vector3 worldTR = ImageToWorldPosition(xMax, yMax, zDistance);
         Vector3 worldBR = ImageToWorldPosition(xMax, yMin, zDistance);
 
-        GameObject boxGO = new GameObject("BoundingBox");
-        LineRenderer lr = boxGO.AddComponent<LineRenderer>();
-        lr.widthMultiplier = 0.005f;
-        lr.loop = true;
-        lr.positionCount = 4;
+        //GameObject boxGO = new GameObject("BoundingBox");
+        //LineRenderer lr = boxGO.AddComponent<LineRenderer>();
+        //lr.widthMultiplier = 0.005f;
+        //lr.loop = true;
+        //lr.positionCount = 4;
 
-        lr.material = boundingBoxMaterial != null ? boundingBoxMaterial : new Material(Shader.Find("Sprites/Default"));
-        lr.material.color = colors.map[det.LabelIdx];
+        //lr.material = boundingBoxMaterial != null ? boundingBoxMaterial : new Material(Shader.Find("Sprites/Default"));
+        //lr.material.color = colors.map[det.LabelIdx];
 
-        lr.SetPosition(0, worldBL);
-        lr.SetPosition(1, worldTL);
-        lr.SetPosition(2, worldTR);
-        lr.SetPosition(3, worldBR);
+        //lr.SetPosition(0, worldBL);
+        //lr.SetPosition(1, worldTL);
+        //lr.SetPosition(2, worldTR);
+        //lr.SetPosition(3, worldBR);
 
-        labels.Add(Tuple.Create(boxGO, (Renderer)lr));
+        //labels.Add(Tuple.Create(boxGO, (Renderer)lr));
 
-        GameObject textGO = new GameObject("LabelText");
-        textGO.transform.position = worldTL + new Vector3(0, 0.05f, 0);
-        textGO.transform.LookAt(Camera.main.transform);
-        textGO.transform.Rotate(0, 180f, 0);
+        //GameObject textGO = new GameObject("LabelText");
+        //textGO.transform.position = worldTL + new Vector3(0, 0.05f, 0);
+        //textGO.transform.LookAt(Camera.main.transform);
+        //textGO.transform.Rotate(0, 180f, 0);
 
-        TextMeshPro tm = textGO.AddComponent<TextMeshPro>();
-        tm.text = $"{det.Label} ({det.Confidence:F2})";
-        tm.fontSize = 0.3f;
-        tm.alignment = TextAlignmentOptions.Center;
-        tm.color = colors.map[det.LabelIdx];
+        //TextMeshPro tm = textGO.AddComponent<TextMeshPro>();
+        //tm.text = $"{det.Label} ({det.Confidence:F2})";
+        //tm.fontSize = 0.3f;
+        //tm.alignment = TextAlignmentOptions.Center;
+        //tm.color = colors.map[det.LabelIdx];
 
-        labels.Add(Tuple.Create(textGO, textGO.GetComponent<Renderer>()));
+        //labels.Add(Tuple.Create(textGO, textGO.GetComponent<Renderer>()));
 
         // 버튼은 라벨마다 한 번만 생성
         if (!activeButtonInstances.ContainsKey(det.Label))
