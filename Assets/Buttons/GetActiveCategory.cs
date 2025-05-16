@@ -1,13 +1,16 @@
 using System.Collections;
-using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.Networking;
-using TMPro;
+using UnityEngine;
 
-public class RequestAPI : MonoBehaviour
+public class ActivateByName : MonoBehaviour
 {
-    private string base_url = SERVER.server;
+    public List<GameObject> allObjects;
     public string user_id = SERVER.user_id;
-    public string category;
+    private string base_url = SERVER.server;
+
+    // API로 받은 활성화할 오브젝트 이름 리스트
+    private List<string> namesFromAPI;
 
     private Coroutine autoRefreshCoroutine;
 
@@ -15,7 +18,7 @@ public class RequestAPI : MonoBehaviour
     {
         if (autoRefreshCoroutine == null)
         {
-            StartCoroutine(GetRequests(user_id, category)); // 최초 요청
+            StartCoroutine(GetActiveRequests(user_id)); // 최초 요청
             autoRefreshCoroutine = StartCoroutine(AutoRefreshRoutine()); // 중복 실행 방지
         }
     }
@@ -35,27 +38,21 @@ public class RequestAPI : MonoBehaviour
         {
             yield return new WaitForSeconds(5f);
             Debug.Log("Fetching data for user_id = " + user_id);
-            yield return StartCoroutine(GetRequests(user_id, category));
+            yield return StartCoroutine(GetActiveRequests(user_id));
         }
     }
 
-    public void GetRequestNames()
+    // 호출 시 이름이 일치하는 오브젝트만 활성화
+    IEnumerator GetActiveRequests(string user_id)
     {
-        StartCoroutine(GetRequests(user_id, category));
-    }
-    public TextMeshPro[] textMeshProObjects;
-
-    IEnumerator GetRequests(string user_id, string category)
-    {
-        string request_url = $"/get-button-by-category/";
+        string request_url = $"/get-selected-category-ar/";
         string url = $"http://" + base_url + request_url;
         Debug.Log($"URL: {url}");
 
         // JSON 데이터 생성
         RequestData requestBody = new RequestData
         {
-            user_id = user_id,
-            category = category
+            user_id = user_id
         };
         string jsonData = JsonUtility.ToJson(requestBody);
 
@@ -76,39 +73,46 @@ public class RequestAPI : MonoBehaviour
         }
         else
         {
-            string jsonResponse = request.downloadHandler.text;
-            Debug.Log($"Response: {jsonResponse}");
+            Debug.Log($"Response: {request.downloadHandler.text}");
 
-            // JSON 응답 파싱
-            string wrappedJson = "{\"items\":" + jsonResponse + "}";
-            ButtonDataList dataList = JsonUtility.FromJson<ButtonDataList>(wrappedJson);
+            // JSON 배열을 강제로 객체 형태로 감싸기
+            string rawJson = request.downloadHandler.text;
+            string wrappedJson = "{\"items\":" + rawJson + "}";
 
-            for (int i = 0; i < dataList.items.Length && i < textMeshProObjects.Length; i++)
+            StringListWrapper wrapper = JsonUtility.FromJson<StringListWrapper>(wrappedJson);
+            namesFromAPI = wrapper.items;
+
+            // 오브젝트 활성화/비활성화 처리
+            foreach (GameObject obj in allObjects)
             {
-                textMeshProObjects[i].text = dataList.items[i].button_text;
-                Debug.Log($"Assigned '{dataList.items[i].button_text}' to TextMeshPro object at index {i}");
+                if (obj != null)
+                {
+                    obj.SetActive(namesFromAPI.Contains(obj.name));
+                }
+            }
+        }
+
+
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj != null)
+            {
+                // 이름이 리스트에 있으면 활성화, 없으면 비활성화
+                if (namesFromAPI.Contains(obj.name))
+                {
+                    obj.SetActive(true);
+                }
+                else
+                {
+                    obj.SetActive(false);
+                }
             }
         }
     }
 }
 
-public class RequestData
-{
-    public string user_id;
-    public string category;
-}
-
 [System.Serializable]
-public class ButtonData
+public class StringListWrapper
 {
-    public int button_id;
-    public string category;
-    public string button_text;
-    public string user_id;
-}
-
-[System.Serializable]
-public class ButtonDataList
-{
-    public ButtonData[] items;
+    public List<string> items;
 }
