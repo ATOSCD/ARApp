@@ -321,7 +321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fa9bf435eb8844f992c57eeefce052, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonBarPrefab: {fileID: 7169913082385706386, guid: 3d86e94fbe74d06459694a85b4041485, type: 3}
+  buttonBarPrefab: {fileID: 2303335718092253157, guid: 499c4a520da47c245ba8ecb6f71134a1, type: 3}
   spawnParent: {fileID: 2186768370750933679}
   spawnOffset: {x: 0.1, y: 0, z: 0}
 --- !u!4 &2186768370750933679 stripped
