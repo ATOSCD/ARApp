@@ -51,7 +51,7 @@ public class TVWebSocketManager : MonoBehaviour
             return;
         }
 
-        IotMessage msg = new IotMessage
+        TVIotMessage msg = new TVIotMessage
         {
             iot_id = iotId,
             message = message
@@ -125,7 +125,7 @@ public class TVWebSocketManager : MonoBehaviour
 }
 
 [System.Serializable]
-class IotMessage
+class TVIotMessage
 {
     public string iot_id;
     public string message;
