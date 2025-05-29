@@ -1019,6 +1019,14 @@ PrefabInstance:
       propertyPath: m_Text
       value: "\uBE44\uBC00\uBC88\uD638"
       objectReference: {fileID: 0}
+    - target: {fileID: 1227984219132118273, guid: 9039aae1f4c02da49a5d92f4a1c91fd4, type: 3}
+      propertyPath: m_InputType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227984219132118273, guid: 9039aae1f4c02da49a5d92f4a1c91fd4, type: 3}
+      propertyPath: m_ContentType
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 1765799051758416192, guid: 9039aae1f4c02da49a5d92f4a1c91fd4, type: 3}
       propertyPath: m_Size.y
       value: 30
