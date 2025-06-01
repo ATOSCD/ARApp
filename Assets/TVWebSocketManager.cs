@@ -11,7 +11,7 @@ public class TVWebSocketManager : MonoBehaviour
     //public static TVWebSocketManager Instance { get; private set; } // 싱글톤 패턴
 
     private WebSocket websocket; // NativeWebSocket.WebSocket 명시적 사용
-    public string userId = SERVER.user_id;               // 현재 사용자의 user_id
+    private string userId = SERVER.user_id;               // 현재 사용자의 user_id
     //public string iotId;
 
     private async void OnEnable()

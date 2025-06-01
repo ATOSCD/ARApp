@@ -6,7 +6,7 @@ using TMPro;
 public class RequestSend : MonoBehaviour
 {
     private string base_url = SERVER.server;
-    public string user_id = SERVER.user_id;
+    private string user_id = SERVER.user_id;
     public string category;
 
     public void SendRequest(TextMeshPro input)
@@ -29,7 +29,8 @@ public class RequestSend : MonoBehaviour
         {
             user_id = user_id,
             title = notificationTitle,
-            body = notificationBody
+            body = notificationBody,
+            category = category
 
         };
         string jsonData = JsonUtility.ToJson(requestBody);
@@ -58,4 +59,5 @@ public class RequestNotificationData
     public string user_id;
     public string title;
     public string body;
+    public string category;
 }

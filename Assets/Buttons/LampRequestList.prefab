@@ -650,7 +650,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8643814258363662588, guid: 3fb505a7f547bb44aa5edf1bbec53138, type: 3}
       propertyPath: m_text
-      value: "\uBB34\uB4DC\uB4F1 \uAD00\uB828 \uC694\uAD6C\uC0AC\uD56D"
+      value: "\uB7A8\uD504 \uAD00\uB828 \uC694\uAD6C\uC0AC\uD56D"
       objectReference: {fileID: 0}
     - target: {fileID: 8643814258363662588, guid: 3fb505a7f547bb44aa5edf1bbec53138, type: 3}
       propertyPath: m_fontSize
@@ -773,8 +773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13fe48a8204fa9945b1332b280e66845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  user_id: patrick
-  category: "\uBB34\uB4DC\uB4F1"
+  category: "\uB7A8\uD504"
 --- !u!1 &4194051421684602091 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3332691474015562309, guid: 3fb505a7f547bb44aa5edf1bbec53138, type: 3}
@@ -792,8 +791,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13fe48a8204fa9945b1332b280e66845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  user_id: patrick
-  category: "\uBB34\uB4DC\uB4F1"
+  category: "\uB7A8\uD504"
 --- !u!1 &4194051422137812249 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3332691473428593591, guid: 3fb505a7f547bb44aa5edf1bbec53138, type: 3}
@@ -840,8 +838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13fe48a8204fa9945b1332b280e66845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  user_id: patrick
-  category: "\uBB34\uB4DC\uB4F1"
+  category: "\uB7A8\uD504"
 --- !u!1 &5395172020622040912 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6821786779924668926, guid: 3fb505a7f547bb44aa5edf1bbec53138, type: 3}
@@ -917,8 +914,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13fe48a8204fa9945b1332b280e66845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  user_id: patrick
-  category: "\uBB34\uB4DC\uB4F1"
+  category: "\uB7A8\uD504"
 --- !u!1 &7169913082385706386 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8643814256977285948, guid: 3fb505a7f547bb44aa5edf1bbec53138, type: 3}
@@ -948,7 +944,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fda64f31aeffdca40997fb1456989ed4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  user_id: patrick
   category: "\uB7A8\uD504"
   textMeshProObjects:
   - {fileID: 6867264287114185737}

@@ -15,7 +15,7 @@ public class WebSocketManager : MonoBehaviour
     public GameObject chatContentObject; // 기존 GameObject를 참조
     public InputField textToSend;
     private TextMeshProUGUI chatContentText;        // GameObject의 Text 컴포넌트 참조
-    public string userId;               // 현재 사용자의 user_id
+    private string userId = SERVER.user_id;               // 현재 사용자의 user_id
 
     private void Awake()
     {
@@ -124,7 +124,7 @@ public class WebSocketManager : MonoBehaviour
     {
         ChatMessage chat = JsonUtility.FromJson<ChatMessage>(message);
 
-        string formattedMessage = $"<b>{chat.user_id}</b> : {chat.message}";
+        string formattedMessage = $"<b>{chat.user_name}</b> : {chat.message}";
         // 기존 GameObject의 Text UI에 메시지 추가
         if (chatContentText != null)
         {
@@ -156,5 +156,6 @@ public class WebSocketManager : MonoBehaviour
 class ChatMessage
 {
     public string user_id;
+    public string user_name;
     public string message;
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using UnityEngine;
 
-public class ActivateByName : MonoBehaviour
+public class RecommendByName : MonoBehaviour
 {
     public List<GameObject> allObjects;
     private string user_id = SERVER.user_id;
@@ -45,7 +45,7 @@ public class ActivateByName : MonoBehaviour
     // 호출 시 이름이 일치하는 오브젝트만 활성화
     IEnumerator GetActiveRequests(string user_id)
     {
-        string request_url = $"/get-selected-category-ar/";
+        string request_url = $"/recommend-category/";
         string url = $"http://" + base_url + request_url;
         Debug.Log($"URL: {url}");
 
@@ -79,15 +79,20 @@ public class ActivateByName : MonoBehaviour
             string rawJson = request.downloadHandler.text;
             string wrappedJson = "{\"items\":" + rawJson + "}";
 
-            StringListWrapper wrapper = JsonUtility.FromJson<StringListWrapper>(wrappedJson);
-            namesFromAPI = wrapper.items;
+            CategoryCountListWrapper wrapper = JsonUtility.FromJson<CategoryCountListWrapper>(wrappedJson);
+            // category만 추출해서 리스트로 변환
+            List<string> categoriesFromAPI = new List<string>();
+            foreach (var item in wrapper.items)
+            {
+                categoriesFromAPI.Add(item.category);
+            }
 
             // 오브젝트 활성화/비활성화 처리
             foreach (GameObject obj in allObjects)
             {
                 if (obj != null)
                 {
-                    obj.SetActive(namesFromAPI.Contains(obj.name));
+                    obj.SetActive(categoriesFromAPI.Contains(obj.name));
                 }
             }
         }
@@ -112,7 +117,14 @@ public class ActivateByName : MonoBehaviour
 }
 
 [System.Serializable]
-public class StringListWrapper
+public class CategoryCount
 {
-    public List<string> items;
+    public string category;
+    public int count;
+}
+
+[System.Serializable]
+public class CategoryCountListWrapper
+{
+    public CategoryCount[] items;
 }

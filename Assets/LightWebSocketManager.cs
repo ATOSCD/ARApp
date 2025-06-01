@@ -6,7 +6,7 @@ public class LightWebSocketManager : MonoBehaviour
     public static LightWebSocketManager Instance { get; private set; }
 
     private WebSocket websocket;
-    public string userId = SERVER.user_id;
+    private string userId = SERVER.user_id;
 
     private void Awake()
     {

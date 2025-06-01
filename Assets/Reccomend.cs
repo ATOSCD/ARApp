@@ -19,7 +19,7 @@ public class Recommend : MonoBehaviour
     public TextMeshProUGUI Button3;
     public TextMeshProUGUI Button4;
 
-    public string userId = SERVER.user_id;               // 현재 사용자의 user_id
+    private string userId = SERVER.user_id;               // 현재 사용자의 user_id
 
     private void Awake()
     {

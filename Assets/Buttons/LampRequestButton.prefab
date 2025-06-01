@@ -66,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5092507606405556714, guid: c25d8f2d22117bd40ad824684551fbde, type: 3}
       propertyPath: m_text
-      value: "\uBB34\uB4DC\uB4F1"
+      value: "\uB7A8\uD504"
       objectReference: {fileID: 0}
     - target: {fileID: 5092507606405556714, guid: c25d8f2d22117bd40ad824684551fbde, type: 3}
       propertyPath: m_fontSize

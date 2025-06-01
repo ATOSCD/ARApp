@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 public class Emergency : MonoBehaviour
 {
     private string base_url = SERVER.server;
-    public string user_id = SERVER.user_id;
+    private string user_id = SERVER.user_id;
 
     public void SendEmergencyRequest()
     {

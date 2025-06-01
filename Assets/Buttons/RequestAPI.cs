@@ -6,7 +6,7 @@ using TMPro;
 public class RequestAPI : MonoBehaviour
 {
     private string base_url = SERVER.server;
-    public string user_id = SERVER.user_id;
+    private string user_id = SERVER.user_id;
     public string category;
 
     private Coroutine autoRefreshCoroutine;
