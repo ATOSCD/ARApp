@@ -1624,13 +1624,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Prediction
       objectReference: {fileID: 0}
+    - target: {fileID: 43846528428747083, guid: 426ee776fdb6d9e4e9e80e9283e6ed65, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 43846528428747083, guid: 426ee776fdb6d9e4e9e80e9283e6ed65, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 426ee776fdb6d9e4e9e80e9283e6ed65, type: 3}
 --- !u!224 &115306333 stripped
 RectTransform:
@@ -9517,12 +9518,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2187ae04ebd2a9c498b353347cf3fa43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  model: {fileID: 5022602860645237092, guid: 0d7f02a2499095b4da4ba913691078fc, type: 3}
-  cameraResolutionWidth: 640
-  cameraResolutionHeight: 480
+  model: {fileID: 5022602860645237092, guid: f767b741782264f4a8ae9078aa156e40, type: 3}
+  cameraResolutionWidth: 896
+  cameraResolutionHeight: 504
   inferenceImgSize: 320
   numClasses: 14
-  confidenceThreshold: 0.3
+  confidenceThreshold: 0.5
   boundingBoxMaterial: {fileID: 2100000, guid: 763a3f8ddcbfda448b2c72cfc3529f00, type: 2}
   buttonPrefabs:
   - {fileID: 2186768370230316110, guid: d656a916b7db90f43bc79d8d4d647b63, type: 3}

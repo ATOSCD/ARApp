@@ -94,11 +94,30 @@ public class Detection : MonoBehaviour
         {
             if (webCamTexture != null && webCamTexture.isPlaying)
             {
+                // 원본 카메라 이미지 저장
+                Texture2D originalTexture = new Texture2D(webCamTexture.width, webCamTexture.height);
+                originalTexture.SetPixels(webCamTexture.GetPixels());
+                originalTexture.Apply();
+
+                byte[] rawImageBytes = originalTexture.EncodeToJPG();
+                string rawPath = System.IO.Path.Combine(Application.persistentDataPath, "raw_input.jpg");
+                System.IO.File.WriteAllBytes(rawPath, rawImageBytes);
+                Debug.Log("Saved raw WebCamTexture image to: " + rawPath);
+
                 CropTexture(webCamTexture, inferenceImgSize, inferenceImgSize);
-                var tensor = new Tensor(croppedTexture, false, Vector4.one, Vector4.zero);
+                var tensor = PreprocessTexture(croppedTexture);
+
+                // 모델 입력으로 들어가는 크롭된 이미지를 저장해보기
+                byte[] bytes = croppedTexture.EncodeToJPG();
+                string savePath = System.IO.Path.Combine(Application.persistentDataPath, "input.jpg");
+                System.IO.File.WriteAllBytes(savePath, bytes);
+                Debug.Log("Saved cropped input to: " + savePath);
 
                 worker.Execute(tensor).FlushSchedule(true);
                 Tensor result = worker.PeekOutput("output0");
+
+                Debug.Log($"Output shape: {result.shape}");
+                Debug.Log($"Tensor dims: batch={result.shape.batch}, height={result.shape.height}, width={result.shape.width}, channels={result.shape.channels}");
 
                 var boxes_tmp = new List<DetectionResult>();
                 ParseYoloOutput(result, confidenceThreshold, boxes_tmp);
@@ -118,21 +137,50 @@ public class Detection : MonoBehaviour
 
                 foreach (var box in boxes)
                 {
+                    // 원본 카메라 이미지 저장
+                    Texture2D originalDetectedTexture = new Texture2D(webCamTexture.width, webCamTexture.height);
+                    originalDetectedTexture.SetPixels(webCamTexture.GetPixels());
+                    originalDetectedTexture.Apply();
+
+                    byte[] rawDetectedImageBytes = originalDetectedTexture.EncodeToJPG();
+                    string name = $"{box.Label}_detected";
+                    string rawDetectedPath = System.IO.Path.Combine(Application.persistentDataPath, name + ".jpg");
+                    System.IO.File.WriteAllBytes(rawDetectedPath, rawDetectedImageBytes);
+                    Debug.Log("Saved detected raw WebCamTexture image to: " + rawDetectedPath);
+
+                    // 모델 입력으로 들어가는 크롭된 이미지를 저장해보기
+                    byte[] detectedBytes = croppedTexture.EncodeToJPG();
+                    string saveDetectedPath = System.IO.Path.Combine(Application.persistentDataPath, name + "_cropped.jpg");
+                    System.IO.File.WriteAllBytes(saveDetectedPath, detectedBytes);
+                    Debug.Log("Saved detected cropped input to: " + saveDetectedPath);
+
+
                     GenerateBoundingBox(box);
                 }
 
                 tensor.Dispose();
                 result.Dispose();
             }
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(2f);
         }
     }
 
     private void CropTexture(WebCamTexture sourceTexture, int cropWidth, int cropHeight)
     {
-        int centerX = sourceTexture.width / 2 - cropWidth / 2;
-        int centerY = sourceTexture.height / 2 - cropHeight / 2;
-        croppedTexture.SetPixels(sourceTexture.GetPixels(centerX, centerY, cropWidth, cropHeight));
+        int texWidth = sourceTexture.width;
+        int texHeight = sourceTexture.height;
+
+        if (texWidth < cropWidth || texHeight < cropHeight)
+        {
+            Debug.LogWarning($"Camera resolution ({texWidth}x{texHeight}) is smaller than inference size ({cropWidth}x{cropHeight}). Skipping frame.");
+            return;
+        }
+
+        int centerX = Mathf.Clamp(texWidth / 2 - cropWidth / 2, 0, texWidth - cropWidth);
+        int centerY = Mathf.Clamp(texHeight / 2 - cropHeight / 2, 0, texHeight - cropHeight);
+
+        Color[] pixels = sourceTexture.GetPixels(centerX, centerY, cropWidth, cropHeight);
+        croppedTexture.SetPixels(pixels);
         croppedTexture.Apply();
     }
 
@@ -152,12 +200,18 @@ public class Detection : MonoBehaviour
 
     private BoundingBox ExtractBoundingBox(Tensor tensor, int row)
     {
+        float rawX = tensor[0, 0, row, 0];
+        float rawY = tensor[0, 0, row, 1];
+        float rawW = tensor[0, 0, row, 2];
+        float rawH = tensor[0, 0, row, 3];
+
+        Debug.Log($"Raw BBox: X={rawX}, Y={rawY}, W={rawW}, H={rawH}");
         return new BoundingBox
         {
-            X = tensor[0, 0, row, 0],
-            Y = tensor[0, 0, row, 1],
-            Width = tensor[0, 0, row, 2],
-            Height = tensor[0, 0, row, 3]
+            X = tensor[0, 0, row, 0] / inferenceImgSize,
+            Y = tensor[0, 0, row, 1] / inferenceImgSize,
+            Width = tensor[0, 0, row, 2] / inferenceImgSize,
+            Height = tensor[0, 0, row, 3] / inferenceImgSize
         };
     }
 
@@ -174,6 +228,22 @@ public class Detection : MonoBehaviour
             }
         }
         return (classIdx, maxConf);
+    }
+
+    private Tensor PreprocessTexture(Texture2D tex)
+    {
+        // Barracuda는 자동 정규화/채널변환을 안 해주므로 직접 처리
+        Color32[] pixels = tex.GetPixels32();
+        float[] input = new float[tex.width * tex.height * 3];
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            // RGB 순서, 0~1 정규화
+            input[i * 3 + 0] = pixels[i].r / 255.0f;
+            input[i * 3 + 1] = pixels[i].g / 255.0f;
+            input[i * 3 + 2] = pixels[i].b / 255.0f;
+        }
+        // ONNX 입력 shape이 (1, height, width, 3)라면 아래처럼 생성
+        return new Tensor(1, tex.height, tex.width, 3, input);
     }
 
     private void GenerateBoundingBox(DetectionResult det)
@@ -225,31 +295,31 @@ public class Detection : MonoBehaviour
         labels.Add(Tuple.Create(textGO, textGO.GetComponent<Renderer>()));
 
         // 버튼은 라벨마다 한 번만 생성
-        //if (!activeButtonInstances.ContainsKey(det.Label))
-        //{
-        //    if (buttonPrefabsDict.ContainsKey(det.Label))
-        //    {
-        //        GameObject prefab = buttonPrefabsDict[det.Label];
-        //        GameObject newButton = Instantiate(prefab);
+        if (!activeButtonInstances.ContainsKey(det.Label))
+        {
+            if (buttonPrefabsDict.ContainsKey(det.Label))
+            {
+                GameObject prefab = buttonPrefabsDict[det.Label];
+                GameObject newButton = Instantiate(prefab);
 
-        //        Vector3 directionToCamera = (Camera.main.transform.position - worldBR).normalized;
-        //        Vector3 spawnPos = worldBR + directionToCamera * 0.1f;
+                Vector3 directionToCamera = (Camera.main.transform.position - worldBR).normalized;
+                Vector3 spawnPos = worldBR + directionToCamera * 0.1f;
 
-        //        newButton.transform.position = spawnPos;
-        //        newButton.transform.LookAt(Camera.main.transform);
-        //        newButton.transform.Rotate(0, 180f, 0);
-        //        newButton.transform.localScale = Vector3.one * 1.5f;
+                newButton.transform.position = spawnPos;
+                newButton.transform.LookAt(Camera.main.transform);
+                newButton.transform.Rotate(0, 180f, 0);
+                newButton.transform.localScale = Vector3.one * 1.5f;
 
-        //        TextMeshPro text = newButton.GetComponentInChildren<TextMeshPro>();
+                TextMeshPro text = newButton.GetComponentInChildren<TextMeshPro>();
 
-        //        activeButtonInstances[det.Label] = newButton;
-        //        Debug.Log($"Button created for label: {det.Label}");
-        //    }
-        //    else
-        //    {
-        //        Debug.LogWarning($"No prefab assigned for label: {det.Label}");
-        //    }
-        //}
+                activeButtonInstances[det.Label] = newButton;
+                Debug.Log($"Button created for label: {det.Label}");
+            }
+            else
+            {
+                Debug.LogWarning($"No prefab assigned for label: {det.Label}");
+            }
+        }
     }
 
     private List<DetectionResult> NonMaxSuppression(float threshold, List<DetectionResult> boxes)
@@ -259,13 +329,12 @@ public class Detection : MonoBehaviour
 
     private Vector3 ImageToWorldPosition(float x, float y, float zDistance)
     {
-        // x, y를 0~1 정규화로 해석
-        float normalizedX = Mathf.Clamp01(x / inferenceImgSize);
-        float normalizedY = Mathf.Clamp01(y / inferenceImgSize);
+        float normalizedX = Mathf.Clamp01(x);
+        float normalizedY = Mathf.Clamp01(y);
 
         // 스크린 좌표로 변환 (카메라 비율 고려)
         float screenX = normalizedX * Screen.width;
-        float screenY = (1f - normalizedY) * Screen.height;
+        float screenY = normalizedY * Screen.height;
 
         Vector3 screenPos = new Vector3(screenX, screenY, zDistance);
 
