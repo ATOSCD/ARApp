@@ -1,10 +1,13 @@
 using System;
 using System.Text;
-using UnityEngine;
-using UnityEngine.UI;
+using MixedReality.Toolkit;
 using NativeWebSocket;
 using TMPro;
-using MixedReality.Toolkit;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
+using System.Collections;
+
 
 public class WebSocketManager : MonoBehaviour
 {
@@ -150,6 +153,52 @@ public class WebSocketManager : MonoBehaviour
         websocket?.DispatchMessageQueue();
 #endif
     }
+
+
+    private string base_url = SERVER.server;
+
+    public void SendChatNotification()
+    {
+        StartCoroutine(SendRequests(userId, textToSend.text));
+    }
+
+    IEnumerator SendRequests(string user_id, string input)
+    {
+        string request_url = $"/send-chat-notification/";
+        string url = $"http://" + base_url + request_url;
+        Debug.Log($"URL: {url}");
+
+        string notificationTitle = "환자의 채팅";
+
+        // 버튼 ID를 TextMeshPro 객체의 텍스트로 설정
+        string notificationBody = input;
+        // JSON 데이터 생성
+        RequestNotificationData requestBody = new RequestNotificationData
+        {
+            user_id = user_id,
+            title = notificationTitle,
+            body = notificationBody,
+
+        };
+        string jsonData = JsonUtility.ToJson(requestBody);
+        // UnityWebRequest 생성
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("Accept", "application/json");
+        yield return request.SendWebRequest();
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.LogError($"ERROR: {request.error}");
+        }
+        else
+        {
+            string jsonResponse = request.downloadHandler.text;
+            Debug.Log($"Response: {jsonResponse}");
+        }
+    }
 }
 
 [System.Serializable]
@@ -158,4 +207,11 @@ class ChatMessage
     public string user_id;
     public string user_name;
     public string message;
+}
+
+public class ChatNotificationData
+{
+    public string user_id;
+    public string title;
+    public string body;
 }

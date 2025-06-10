@@ -13,7 +13,10 @@ public class SpawnUniqueButtons : MonoBehaviour
         if ( newButton == null)
         {
             Vector3 spawnPosition = transform.position + spawnOffset;
-            newButton = Instantiate(buttonBarPrefab, spawnPosition, Quaternion.identity, spawnParent);
+            newButton = Instantiate(buttonBarPrefab, spawnParent);
+
+            newButton.transform.localPosition = spawnOffset;
+            newButton.transform.localRotation = Quaternion.identity;
             newButton.SetActive(true);
         }
         else

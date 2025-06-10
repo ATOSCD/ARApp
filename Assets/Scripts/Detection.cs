@@ -15,7 +15,13 @@ public class Detection : MonoBehaviour
 
     public int cameraResolutionWidth = 640;
     public int cameraResolutionHeight = 480;
-    public int inferenceImgSize = 320;
+
+    public int inferenceImgSizeWidth = 320;
+    public int inferenceImgSizeHeight = 320;
+    
+    public int cropSizeWidth = 320;
+    public int cropSizeHeight = 320;
+
     public int numClasses = 14;
     public float confidenceThreshold = 0.5f;
 
@@ -32,7 +38,7 @@ public class Detection : MonoBehaviour
 
     public List<GameObject> buttonPrefabs;
     private Dictionary<string, GameObject> buttonPrefabsDict;
-    private Dictionary<string, GameObject> activeButtonInstances = new Dictionary<string, GameObject>();
+    public static Dictionary<string, GameObject> activeButtonInstances = new Dictionary<string, GameObject>();
 
     void Start()
     {
@@ -53,7 +59,7 @@ public class Detection : MonoBehaviour
 
         names = new COCONames();
         colors = new COCOColors();
-        croppedTexture = new Texture2D(inferenceImgSize, inferenceImgSize, TextureFormat.RGB24, false);
+        croppedTexture = new Texture2D(cropSizeWidth, cropSizeHeight, TextureFormat.RGB24, false);
 
         var predictionObject = GameObject.Find("Prediction");
         if (predictionObject != null)
@@ -104,14 +110,25 @@ public class Detection : MonoBehaviour
                 System.IO.File.WriteAllBytes(rawPath, rawImageBytes);
                 Debug.Log("Saved raw WebCamTexture image to: " + rawPath);
 
-                CropTexture(webCamTexture, inferenceImgSize, inferenceImgSize);
-                var tensor = PreprocessTexture(croppedTexture);
+                CropTexture(webCamTexture, cropSizeWidth, cropSizeHeight);
+
+                Texture2D resizedTexture = ResizeTexture(croppedTexture, inferenceImgSizeWidth, inferenceImgSizeHeight);
+
+                //croppedTexture.Reinitialize(inferenceImgSize / 2, inferenceImgSize / 2);
+                //Graphics.Blit(croppedTexture, );
+
+                var tensor = PreprocessTexture(resizedTexture);
 
                 // 모델 입력으로 들어가는 크롭된 이미지를 저장해보기
                 byte[] bytes = croppedTexture.EncodeToJPG();
-                string savePath = System.IO.Path.Combine(Application.persistentDataPath, "input.jpg");
+                string savePath = System.IO.Path.Combine(Application.persistentDataPath, "cropped_input.jpg");
                 System.IO.File.WriteAllBytes(savePath, bytes);
                 Debug.Log("Saved cropped input to: " + savePath);
+
+                byte[] bytesResized = resizedTexture.EncodeToJPG();
+                string savePathResized = System.IO.Path.Combine(Application.persistentDataPath, "resized_input.jpg");
+                System.IO.File.WriteAllBytes(savePathResized, bytesResized);
+                Debug.Log("Saved resized input to: " + savePathResized);
 
                 worker.Execute(tensor).FlushSchedule(true);
                 Tensor result = worker.PeekOutput("output0");
@@ -138,21 +155,21 @@ public class Detection : MonoBehaviour
                 foreach (var box in boxes)
                 {
                     // 원본 카메라 이미지 저장
-                    Texture2D originalDetectedTexture = new Texture2D(webCamTexture.width, webCamTexture.height);
-                    originalDetectedTexture.SetPixels(webCamTexture.GetPixels());
-                    originalDetectedTexture.Apply();
+                    //Texture2D originalDetectedTexture = new Texture2D(webCamTexture.width, webCamTexture.height);
+                    //originalDetectedTexture.SetPixels(webCamTexture.GetPixels());
+                    //originalDetectedTexture.Apply();
 
-                    byte[] rawDetectedImageBytes = originalDetectedTexture.EncodeToJPG();
-                    string name = $"{box.Label}_detected";
-                    string rawDetectedPath = System.IO.Path.Combine(Application.persistentDataPath, name + ".jpg");
-                    System.IO.File.WriteAllBytes(rawDetectedPath, rawDetectedImageBytes);
-                    Debug.Log("Saved detected raw WebCamTexture image to: " + rawDetectedPath);
+                    //byte[] rawDetectedImageBytes = originalDetectedTexture.EncodeToJPG();
+                    //string name = $"{box.Label}_detected";
+                    //string rawDetectedPath = System.IO.Path.Combine(Application.persistentDataPath, name + ".jpg");
+                    //System.IO.File.WriteAllBytes(rawDetectedPath, rawDetectedImageBytes);
+                    //Debug.Log("Saved detected raw WebCamTexture image to: " + rawDetectedPath);
 
                     // 모델 입력으로 들어가는 크롭된 이미지를 저장해보기
-                    byte[] detectedBytes = croppedTexture.EncodeToJPG();
-                    string saveDetectedPath = System.IO.Path.Combine(Application.persistentDataPath, name + "_cropped.jpg");
-                    System.IO.File.WriteAllBytes(saveDetectedPath, detectedBytes);
-                    Debug.Log("Saved detected cropped input to: " + saveDetectedPath);
+                    //byte[] detectedBytes = croppedTexture.EncodeToJPG();
+                    //string saveDetectedPath = System.IO.Path.Combine(Application.persistentDataPath, name + "_cropped.jpg");
+                    //System.IO.File.WriteAllBytes(saveDetectedPath, detectedBytes);
+                    //Debug.Log("Saved detected cropped input to: " + saveDetectedPath);
 
 
                     GenerateBoundingBox(box);
@@ -208,10 +225,10 @@ public class Detection : MonoBehaviour
         Debug.Log($"Raw BBox: X={rawX}, Y={rawY}, W={rawW}, H={rawH}");
         return new BoundingBox
         {
-            X = tensor[0, 0, row, 0] / inferenceImgSize,
-            Y = tensor[0, 0, row, 1] / inferenceImgSize,
-            Width = tensor[0, 0, row, 2] / inferenceImgSize,
-            Height = tensor[0, 0, row, 3] / inferenceImgSize
+            X = tensor[0, 0, row, 0] / inferenceImgSizeWidth,
+            Y = tensor[0, 0, row, 1] / inferenceImgSizeHeight,
+            Width = tensor[0, 0, row, 2] / inferenceImgSizeWidth,
+            Height = tensor[0, 0, row, 3] / inferenceImgSizeHeight
         };
     }
 
@@ -229,6 +246,25 @@ public class Detection : MonoBehaviour
         }
         return (classIdx, maxConf);
     }
+
+    private Texture2D ResizeTexture(Texture2D source, int newWidth, int newHeight)
+    {
+        RenderTexture rt = RenderTexture.GetTemporary(newWidth, newHeight);
+        Graphics.Blit(source, rt);
+
+        RenderTexture previous = RenderTexture.active;
+        RenderTexture.active = rt;
+
+        Texture2D result = new Texture2D(newWidth, newHeight, source.format, false);
+        result.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
+        result.Apply();
+
+        RenderTexture.active = previous;
+        RenderTexture.ReleaseTemporary(rt);
+
+        return result;
+    }
+
 
     private Tensor PreprocessTexture(Texture2D tex)
     {
