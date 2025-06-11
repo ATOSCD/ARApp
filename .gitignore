@@ -75,4 +75,4 @@ crashlytics-build.properties
 
 # 서버 주소
 /[Aa]ssets/SERVER.cs
-/[Aa]ssets/SERVER.meta
+/[Aa]ssets/SERVER.cs.meta
